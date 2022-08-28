@@ -7,7 +7,6 @@ export class AppController {
 
   @Get()
   getHello(): string {
-    console.log(this.configService.get('db'));
     return 'Hello World!';
   }
 }

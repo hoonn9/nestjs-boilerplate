@@ -9,6 +9,7 @@
   "moduleNameMapper": {
     "@application/(.*)$": "<rootDir>../src/application/$1",
     "@infra/(.*)$": "<rootDir>../src/infra/$1",
+    "@core/(.*)$": "<rootDir>../src/core/$1",
     "@test/(.*)$": "<rootDir>../test/$1"
   }
 }

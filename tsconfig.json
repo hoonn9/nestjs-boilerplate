@@ -14,11 +14,13 @@
     "skipLibCheck": true,
     "noImplicitAny": false,
     "forceConsistentCasingInFileNames": false,
+    "strictPropertyInitialization": false,
     "noFallthroughCasesInSwitch": false,
     "strict": true,
     "paths": {
       "@application/*": ["src/application/*"],
       "@infra/*": ["src/infra/*"],
+      "@core/*": ["src/core/*"],
       "@test/*": ["test/*"]
     }
   }

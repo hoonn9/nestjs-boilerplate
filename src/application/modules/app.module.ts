@@ -1,4 +1,5 @@
-import loadConfig from '@infra/config/load';
+import { validate } from 'src/core/config/env-validation';
+import { databaseConfigRegister } from '@infra/config/database/database.register';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from '../api/app.controller';
@@ -6,7 +7,8 @@ import { AppController } from '../api/app.controller';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      load: [loadConfig],
+      validate: validate,
+      load: [databaseConfigRegister],
     }),
   ],
   controllers: [AppController],
