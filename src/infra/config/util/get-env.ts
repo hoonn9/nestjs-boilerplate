@@ -1,5 +1,5 @@
-import { PickKeyType } from '@core/types/common';
-import { EnvironmentVariables } from '../env-variables';
+import { PickKeyType } from '@core/type/common';
+import { EnvironmentVariables } from '../env-variable';
 
 type EnvType = string | number | boolean | undefined;
 

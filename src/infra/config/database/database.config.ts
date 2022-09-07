@@ -9,4 +9,10 @@ export class DatabaseConfig {
 
   @IsString()
   database: string;
+
+  @IsString()
+  username: string;
+
+  @IsString()
+  password: string;
 }
