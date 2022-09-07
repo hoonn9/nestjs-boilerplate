@@ -1,5 +1,12 @@
+import { IsPort, IsString } from 'class-validator';
+
 export class DatabaseConfig {
+  @IsString()
   host: string;
-  port: number;
+
+  @IsPort()
+  port: string;
+
+  @IsString()
   database: string;
 }

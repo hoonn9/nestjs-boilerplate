@@ -1,11 +1,12 @@
+import { Type } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
-import { EnvironmentVariables } from '@infra/config/env-variables';
 
-export function validate(config: Record<string, unknown>) {
-  const validatedConfig = plainToInstance(EnvironmentVariables, config, {
+export function configValidate<T extends object>(type: Type<T>, config: T) {
+  const validatedConfig = plainToInstance(type, config, {
     enableImplicitConversion: true,
   });
+
   const errors = validateSync(validatedConfig, {
     skipMissingProperties: false,
   });
