@@ -21,8 +21,8 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       port: +dbConfig.port,
       username: dbConfig.username,
       password: dbConfig.password,
-      // entities: [`./src/**/*.entity{.ts,.js}`],
-      // subscribers: ['./src/**/*.subscriber{.ts,.js}'],
+      entities: [`${__dirname}/**/*.entity{.ts,.js}`],
+      subscribers: [`${__dirname}/**/*.subscriber{.ts,.js}`],
     };
   }
 }

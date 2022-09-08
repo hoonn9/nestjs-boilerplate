@@ -7,7 +7,7 @@ import { Repository } from 'typeorm';
 
 export class TypeOrmUserRepository implements UserRepositoryPort {
   constructor(
-    // @InjectRepository(TypeOrmUser)
+    @InjectRepository(TypeOrmUser)
     private readonly userRepository: Repository<TypeOrmUser>,
   ) {}
 

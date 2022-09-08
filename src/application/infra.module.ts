@@ -1,13 +1,7 @@
-import { TypeOrmConfigService } from '@infra/adapter/orm/typeorm/typeorm-config.service';
+import { TypeOrmModule } from '@infra/adapter/orm/typeorm/typeorm.module';
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [
-    TypeOrmModule.forRootAsync({
-      imports: [TypeOrmConfigService],
-      useClass: TypeOrmConfigService,
-    }),
-  ],
+  imports: [TypeOrmModule],
 })
 export class InfraModule {}
