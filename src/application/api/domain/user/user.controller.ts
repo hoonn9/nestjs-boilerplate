@@ -13,7 +13,7 @@ export class UserController {
 
   @Post()
   async createUser(@Body() body: CreateUserDto) {
-    const instance = await CreateUserAdapter.validate(body);
-    return this.createUserUseCase.execute(instance);
+    const port = await CreateUserAdapter.toPort(body);
+    return this.createUserUseCase.execute(port);
   }
 }

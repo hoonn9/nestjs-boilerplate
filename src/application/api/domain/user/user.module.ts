@@ -1,3 +1,4 @@
+import { UserController } from '@application/api/domain/user/user.controller';
 import { CreateUserHandler } from '@core/domain/user/usecase/create-user/create-user.handler';
 import { TypeOrmUser } from '@infra/adapter/orm/typeorm/entity/user.entity';
 import { TypeOrmUserRepository } from '@infra/adapter/orm/typeorm/repository/user.repository';
@@ -23,9 +24,9 @@ const useCase: Provider[] = [
     inject: [UserInjectToken.UserRepository],
   },
 ];
-
 @Module({
   imports: [],
+  controllers: [UserController],
   providers: [...persist, ...useCase],
 })
 export class UserModule {}

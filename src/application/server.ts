@@ -16,6 +16,7 @@ export class ServerApplication {
   public async execute() {
     const configService: ConfigService<Config> = this.app.get(ConfigService);
     const apiConfig = configService.getOrThrow<ApiConfig>('api');
+    this.app.setGlobalPrefix('api');
 
     await this.app.listen(apiConfig.port);
   }

@@ -11,9 +11,9 @@ export class CreateUserAdapter
   @IsString()
   password?: string;
 
-  static async validate(port: CreateUserPort) {
+  static async toPort(port: CreateUserPort) {
     const instance = plainToInstance(CreateUserAdapter, port);
-    await this.validate(instance);
+    await instance.validate();
     return instance;
   }
 }
