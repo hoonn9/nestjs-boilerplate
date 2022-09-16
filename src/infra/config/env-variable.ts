@@ -1,9 +1,9 @@
 import { IsEnum, IsNumber, IsString } from 'class-validator';
 
-enum Environment {
-  Development = 'development',
-  Production = 'production',
+export enum Environment {
+  Local = 'local',
   Test = 'test',
+  Production = 'production',
 }
 
 export class EnvironmentVariables {

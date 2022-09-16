@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@infra/config/config.module';
-import { InfraModule } from '@application/infra.module';
+import { InfraModule } from '@infra/infra.module';
 import { ApiModule } from '@application/api/api.module';
 
 @Module({
