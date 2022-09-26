@@ -12,8 +12,6 @@ export class CreateUserHandler implements CreateUserUseCase {
   ) {}
 
   async execute(port: CreateUserPort): Promise<UserModelDto> {
-    const id = await this.userRepository.newId();
-
     let password: string | null = null;
 
     if (port.password) {
@@ -21,7 +19,6 @@ export class CreateUserHandler implements CreateUserUseCase {
     }
 
     const userModel = new User({
-      id: id,
       password: password,
       email: port.email,
       phoneNumber: port.phoneNumber,

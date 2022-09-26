@@ -11,11 +11,6 @@ export class TypeOrmUserRepository implements UserRepositoryPort {
     private readonly userRepository: Repository<TypeOrmUser>,
   ) {}
 
-  async newId(): Promise<string> {
-    const emptyEntity = new TypeOrmUser();
-    const entity = await this.userRepository.save(emptyEntity);
-    return entity.id;
-  }
   async findById(id: string): Promise<Optional<User>> {
     const entity = await this.userRepository.findOne({
       where: {

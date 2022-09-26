@@ -11,7 +11,7 @@ export type UserPartialProperties = Partial<{
   readonly updatedAt: Date;
 }>;
 
-export type UserConstructorProperties = UserRequiredProperties &
+export type UserConstructorProperties = Omit<UserRequiredProperties, 'id'> &
   UserPartialProperties;
 
 export type UserProperties = UserRequiredProperties &

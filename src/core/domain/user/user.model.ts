@@ -3,6 +3,7 @@ import {
   UserConstructorProperties,
   UserProperties,
 } from '@core/domain/user/user.type';
+import { v4 } from 'uuid';
 
 export class User extends CoreModel<string> {
   private email: string;
@@ -11,7 +12,7 @@ export class User extends CoreModel<string> {
   private phoneNumber: string;
 
   constructor(properties: UserConstructorProperties) {
-    super(properties.id);
+    super(v4());
 
     this.email = properties.email;
     this.phoneNumber = properties.phoneNumber;

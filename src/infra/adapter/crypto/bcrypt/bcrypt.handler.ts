@@ -1,15 +1,17 @@
 import { CryptoHandler } from '@core/common/handler/crypto/crypto.handler';
-import bcrypt from 'bcrypt';
+import { Injectable } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 
+@Injectable()
 export class BcryptCryptoHandler implements CryptoHandler {
   private readonly saltRounds = 10;
 
-  async hash(plainText: string): Promise<string> {
+  public async hash(plainText: string): Promise<string> {
     const hashed = await bcrypt.hash(plainText, this.saltRounds);
     return hashed;
   }
 
-  async compare(plainText: string, hash: string): Promise<boolean> {
+  public async compare(plainText: string, hash: string): Promise<boolean> {
     return bcrypt.compare(plainText, hash);
   }
 }
