@@ -1,8 +1,11 @@
-import { InfraTokens } from '@infra/infra.token';
-import { DatabaseHandler } from '@core/common/adapter/database/database.handler';
+import { InfraInjectTokens } from '@infra/infra.token';
+import { DatabaseHandler } from '@core/common/handler/database/database.handler';
 import { ModuleMetadata } from '@nestjs/common';
 import { NestApplication } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigService } from '@nestjs/config';
+import { Config } from '@infra/config/config';
+import { HttpExceptionFilter } from '@application/api/common/exception-filter/http.exception-filter';
 
 export class TestingServer {
   constructor(
@@ -14,13 +17,17 @@ export class TestingServer {
     const module: TestingModule = await Test.createTestingModule(
       metadata,
     ).compile();
+    const app: NestApplication = module.createNestApplication();
 
-    return new TestingServer(module, module.createNestApplication());
+    const configService: ConfigService<Config> = app.get(ConfigService);
+    app.useGlobalFilters(new HttpExceptionFilter(configService));
+
+    return new TestingServer(module, app);
   }
 
   public async finishTest() {
     const dbHandler = this.testingModule.get<DatabaseHandler>(
-      InfraTokens.DatabaseHandler,
+      InfraInjectTokens.DatabaseHandler,
     );
 
     await dbHandler.drop();

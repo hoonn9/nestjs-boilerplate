@@ -1,4 +1,4 @@
-import { DatabaseHandler } from '@core/common/adapter/database/database.handler';
+import { DatabaseHandler } from '@core/common/handler/database/database.handler';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 

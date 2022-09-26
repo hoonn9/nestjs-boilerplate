@@ -1,16 +1,23 @@
-import { InfraTokens } from '@infra/infra.token';
+import { InfraInjectTokens } from '@infra/infra.token';
 import { TypeOrmDatabaseHandler } from '@infra/adapter/orm/typeorm/typeorm.handler';
 import { TypeOrmModule } from '@infra/adapter/orm/typeorm/typeorm.module';
-import { Module } from '@nestjs/common';
+import { Module, Provider } from '@nestjs/common';
+import { BcryptCryptoHandler } from '@infra/adapter/crypto/bcrypt/bcrypt.handler';
+
+const handlers: Provider[] = [
+  {
+    provide: InfraInjectTokens.DatabaseHandler,
+    useClass: TypeOrmDatabaseHandler,
+  },
+  {
+    provide: InfraInjectTokens.CryptoHandler,
+    useClass: BcryptCryptoHandler,
+  },
+];
 
 @Module({
   imports: [TypeOrmModule],
-  providers: [
-    {
-      provide: InfraTokens.DatabaseHandler,
-      useClass: TypeOrmDatabaseHandler,
-    },
-  ],
-  exports: [InfraTokens.DatabaseHandler],
+  providers: [...handlers],
+  exports: [InfraInjectTokens.DatabaseHandler, InfraInjectTokens.CryptoHandler],
 })
 export class InfraModule {}

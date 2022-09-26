@@ -1,4 +1,11 @@
-import { IsEnum, IsNumber, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsBooleanString,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export enum Environment {
   Local = 'local',
@@ -27,4 +34,8 @@ export class EnvironmentVariables {
 
   @IsString()
   DB_PASSWORD: string;
+
+  @IsOptional()
+  @IsBooleanString()
+  API_LOG_ENABLE: boolean | null;
 }

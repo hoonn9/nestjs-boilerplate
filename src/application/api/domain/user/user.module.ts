@@ -20,10 +20,12 @@ const persist: Provider[] = [
 const useCase: Provider[] = [
   {
     provide: UserInjectToken.CreateUserUseCase,
-    useFactory: (userRepository) => new CreateUserHandler(userRepository),
+    useFactory: (userRepository, cryptoHandler) =>
+      new CreateUserHandler(userRepository, cryptoHandler),
     inject: [UserInjectToken.UserRepository],
   },
 ];
+
 @Module({
   imports: [],
   controllers: [UserController],

@@ -5,6 +5,15 @@ import { CoreEntity } from '../common/entity/core.entity';
 
 @Entity('user')
 export class TypeOrmUser extends CoreEntity implements UserProperties {
+  @Column({ type: 'varchar', unique: true })
+  email: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  birthDate: Date | null;
+
+  @Column({ type: 'varchar', unique: true })
+  phoneNumber: string;
+
   @Column({ type: 'varchar', nullable: true })
   password: string | null;
 

@@ -6,13 +6,13 @@ import {
 import { apiConfigRegister } from './api/api.register';
 import { databaseConfigRegister } from './database/database.register';
 import { configValidate } from './util/env-validation';
-import { EnvironmentVariables } from './env-variable';
+import { Environment, EnvironmentVariables } from './env-variable';
 import * as path from 'path';
 
 const rootPathEnv = (envFile: string) =>
   path.resolve(__dirname, '../../../', envFile);
 
-const envPath: Record<EnvironmentVariables['NODE_ENV'], string> = {
+const envPath: Record<Environment, string> = {
   local: rootPathEnv('.local.env'),
   test: rootPathEnv('.test.env'),
   production: rootPathEnv('.production.env'),

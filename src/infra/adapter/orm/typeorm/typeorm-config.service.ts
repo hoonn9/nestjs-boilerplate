@@ -13,8 +13,9 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
     const dbConfig = this.configService.getOrThrow<DatabaseConfig>('database');
 
     const env = this.configService.getOrThrow<Environment>('NODE_ENV');
+
     switch (env) {
-      case Environment.Production:
+      case Environment.Local:
         return {
           type: 'mysql',
           synchronize: true,

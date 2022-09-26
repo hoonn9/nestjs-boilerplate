@@ -5,16 +5,26 @@ import {
 } from '@core/domain/user/user.type';
 
 export class User extends CoreModel<string> {
+  private email: string;
   private password: string | null = null;
+  private birthDate: Date | null = null;
+  private phoneNumber: string;
 
   constructor(properties: UserConstructorProperties) {
     super(properties.id);
+
+    this.email = properties.email;
+    this.phoneNumber = properties.phoneNumber;
     this.password = properties.password || null;
+    this.birthDate = properties.birthDate || null;
   }
 
   get(): UserProperties {
     return {
       id: this.id,
+      email: this.email,
+      birthDate: this.birthDate,
+      phoneNumber: this.phoneNumber,
       password: this.password,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
