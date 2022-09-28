@@ -11,6 +11,24 @@ export class TypeOrmUserRepository implements UserRepositoryPort {
     private readonly userRepository: Repository<TypeOrmUser>,
   ) {}
 
+  async findByEmailOrPhoneNumber(args: {
+    email: string;
+    phoneNumber: string;
+  }): Promise<User[]> {
+    const users = await this.userRepository.find({
+      where: [
+        {
+          email: args.email,
+        },
+        {
+          phoneNumber: args.phoneNumber,
+        },
+      ],
+    });
+
+    return users.map(User.toModel);
+  }
+
   async findById(id: string): Promise<Optional<User>> {
     const entity = await this.userRepository.findOne({
       where: {

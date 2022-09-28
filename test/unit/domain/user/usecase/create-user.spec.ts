@@ -48,7 +48,7 @@ describe('CreateUserHandler', () => {
     it('should execute CreateUser', async () => {
       const id = faker.datatype.uuid();
 
-      userRepository.newId = jest.fn().mockResolvedValue(id);
+      userRepository.findByEmailOrPhoneNumber = jest.fn().mockResolvedValue([]);
       userRepository.save = jest.fn().mockResolvedValue({
         id,
       });
@@ -63,7 +63,6 @@ describe('CreateUserHandler', () => {
       };
 
       const user = new User({
-        id,
         email: port.email,
         birthDate: port.birthDate,
         phoneNumber: port.phoneNumber,
@@ -72,6 +71,8 @@ describe('CreateUserHandler', () => {
 
       const expectCreateUserDto = UserModelDto.fromModel(user);
       const resultCreateUserDto = await createUserHandler.execute(port);
+
+      resultCreateUserDto.id = user.get().id;
 
       expect(resultCreateUserDto).toEqual(expectCreateUserDto);
     });
