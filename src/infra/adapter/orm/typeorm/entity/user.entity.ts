@@ -14,7 +14,7 @@ export class TypeOrmUser extends CoreEntity implements UserProperties {
   @Column({ type: 'varchar', unique: true })
   phoneNumber: string;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, select: false })
   password: string | null;
 
   static toEntity(model: User): TypeOrmUser {

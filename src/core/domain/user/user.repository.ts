@@ -7,5 +7,6 @@ export interface UserRepositoryPort {
     email: string;
     phoneNumber: string;
   }): Promise<User[]>;
+  findByEmailWithPassword(email: string): Promise<Optional<User>>;
   save(user: User): Promise<void>;
 }

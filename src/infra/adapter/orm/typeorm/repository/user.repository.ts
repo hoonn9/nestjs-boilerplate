@@ -30,13 +30,27 @@ export class TypeOrmUserRepository implements UserRepositoryPort {
   }
 
   async findById(id: string): Promise<Optional<User>> {
-    const entity = await this.userRepository.findOne({
+    const user = await this.userRepository.findOne({
       where: {
         id,
       },
     });
-    return entity ? User.toModel(entity) : null;
+    return user ? User.toModel(user) : null;
   }
+
+  async findByEmailWithPassword(email: string): Promise<Optional<User>> {
+    const user = await this.userRepository.findOne({
+      where: {
+        email: email,
+      },
+      select: {
+        password: true,
+      },
+    });
+
+    return user ? User.toModel(user) : null;
+  }
+
   async save(user: User): Promise<void> {
     await this.userRepository.save(TypeOrmUser.toEntity(user));
   }
