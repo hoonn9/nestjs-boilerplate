@@ -1,10 +1,12 @@
+import { IsNumberOrString } from '@core/common/decorator/validator/is-number-or-string';
+import { Transform } from 'class-transformer';
 import {
-  IsBoolean,
   IsBooleanString,
   IsEnum,
   IsNumber,
   IsOptional,
   IsString,
+  Validate,
 } from 'class-validator';
 
 export enum Environment {
@@ -38,4 +40,14 @@ export class EnvironmentVariables {
   @IsOptional()
   @IsBooleanString()
   API_LOG_ENABLE: boolean | null;
+
+  @IsString()
+  JWT_SECRET_KEY: string;
+
+  @Validate(IsNumberOrString)
+  @Transform(({ value }) => {
+    const parsed = parseInt(value, 10);
+    return isNaN(parsed) ? value : parsed;
+  })
+  JWT_ACCESS_TOKEN_EXPIRES_IN: string | number;
 }

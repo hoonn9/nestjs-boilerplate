@@ -1,3 +1,4 @@
+import { AuthConfig } from '@infra/config/auth/auth.config';
 import { Environment } from '@infra/config/env-variable';
 import { Type } from 'class-transformer';
 import { IsBoolean, IsEnum, IsOptional } from 'class-validator';
@@ -17,4 +18,7 @@ export class Config {
 
   @Type(() => DatabaseConfig)
   database: DatabaseConfig;
+
+  @Type(() => AuthConfig)
+  auth: AuthConfig;
 }
