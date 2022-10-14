@@ -5,6 +5,7 @@ import { ApiConfig } from '@infra/config/api/api.config';
 import { Config } from '@infra/config/config';
 import { HttpExceptionFilter } from '@application/api/common/exception-filter/http.exception-filter';
 import { Logger } from '@nestjs/common';
+import * as cookieParser from 'cookie-parser';
 
 export class ServerApplication {
   constructor(private readonly app: NestApplication) {}
@@ -21,6 +22,7 @@ export class ServerApplication {
 
     this.app.setGlobalPrefix('api');
     this.app.useGlobalFilters(new HttpExceptionFilter(configService));
+    this.app.use(cookieParser());
 
     Logger.log('listening to port: ' + apiConfig.port, NestApplication.name);
     await this.app.listen(apiConfig.port);

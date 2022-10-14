@@ -1,5 +1,6 @@
 import { AuthController } from '@application/api/auth/auth.controller';
 import { AuthService } from '@application/api/auth/auth.service';
+import { JwtStrategy } from '@application/api/auth/strategy/auth-jwt.strategy';
 import { LocalStrategy } from '@application/api/auth/strategy/auth-local.strategy';
 import { UserInjectToken } from '@application/api/domain/user/user.token';
 import { BcryptCryptoHandler } from '@infra/adapter/crypto/bcrypt/bcrypt.handler';
@@ -28,7 +29,7 @@ const persist: Provider[] = [
   },
 ];
 
-const strategies: Provider[] = [LocalStrategy];
+const strategies: Provider[] = [LocalStrategy, JwtStrategy];
 
 @Module({
   imports: [
@@ -36,7 +37,7 @@ const strategies: Provider[] = [LocalStrategy];
       useFactory: (configService: ConfigService<Config>) => {
         return {
           secret: configService.getOrThrow<AuthConfig>('auth', { infer: true })
-            .secret,
+            .jwt.secret,
         };
       },
       inject: [ConfigService],

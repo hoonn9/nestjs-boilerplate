@@ -9,6 +9,7 @@ import { UserModelDto } from '@core/domain/user/user.dto';
 import { User } from '@core/domain/user/user.model';
 import { InfraInjectTokens } from '@infra/infra.token';
 import { CryptoHandler } from '@core/common/handler/crypto/crypto.handler';
+import { Role } from '@core/enum/role.enum';
 
 const providers: Provider[] = [
   {
@@ -63,10 +64,12 @@ describe('CreateUserHandler', () => {
       };
 
       const user = new User({
+        id,
         email: port.email,
         birthDate: port.birthDate,
         phoneNumber: port.phoneNumber,
         password: port.password,
+        role: Role.USER,
       });
 
       const expectCreateUserDto = UserModelDto.fromModel(user);

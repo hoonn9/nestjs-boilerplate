@@ -1,15 +1,21 @@
 import { User } from '@core/domain/user/user.model';
 import { UserRepositoryPort } from '@core/domain/user/user.repository';
 import { Optional } from '@core/type/common';
+import { CoreRepository } from '@infra/adapter/orm/typeorm/common/repository/core.repository';
 import { TypeOrmUser } from '@infra/adapter/orm/typeorm/entity/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-export class TypeOrmUserRepository implements UserRepositoryPort {
+export class TypeOrmUserRepository
+  extends CoreRepository<TypeOrmUser>
+  implements UserRepositoryPort
+{
   constructor(
     @InjectRepository(TypeOrmUser)
     private readonly userRepository: Repository<TypeOrmUser>,
-  ) {}
+  ) {
+    super(userRepository);
+  }
 
   async findByEmailOrPhoneNumber(args: {
     email: string;
@@ -43,9 +49,7 @@ export class TypeOrmUserRepository implements UserRepositoryPort {
       where: {
         email: email,
       },
-      select: {
-        password: true,
-      },
+      select: [...this.getColumns()],
     });
 
     return user ? User.toModel(user) : null;

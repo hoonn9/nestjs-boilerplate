@@ -4,6 +4,7 @@ import { CreateUserUseCase } from '@core/domain/user/usecase/create-user/create-
 import { UserModelDto } from '@core/domain/user/user.dto';
 import { User } from '@core/domain/user/user.model';
 import { UserRepositoryPort } from '@core/domain/user/user.repository';
+import { Role } from '@core/enum/role.enum';
 import { BadRequestException } from '@nestjs/common';
 
 export class CreateUserHandler implements CreateUserUseCase {
@@ -31,11 +32,14 @@ export class CreateUserHandler implements CreateUserUseCase {
     }
 
     const userModel = new User({
+      id: User.newId(),
       password: password,
       email: port.email,
       phoneNumber: port.phoneNumber,
       birthDate: port.birthDate,
+      role: Role.USER,
     });
+
     await this.userRepository.save(userModel);
 
     return UserModelDto.fromModel(userModel);

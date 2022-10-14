@@ -3,21 +3,22 @@ import {
   UserConstructorProperties,
   UserProperties,
 } from '@core/domain/user/user.type';
-import { v4 } from 'uuid';
+import { Role } from '@core/enum/role.enum';
 
 export class User extends CoreModel<string> {
   private email: string;
   private password: string | null = null;
   private birthDate: Date | null = null;
   private phoneNumber: string;
+  private role: Role;
 
   constructor(properties: UserConstructorProperties) {
-    super(v4());
-
+    super(properties.id);
     this.email = properties.email;
     this.phoneNumber = properties.phoneNumber;
     this.password = properties.password || null;
     this.birthDate = properties.birthDate || null;
+    this.role = properties.role;
   }
 
   get(): UserProperties {
@@ -27,6 +28,7 @@ export class User extends CoreModel<string> {
       birthDate: this.birthDate,
       phoneNumber: this.phoneNumber,
       password: this.password,
+      role: this.role,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
     };

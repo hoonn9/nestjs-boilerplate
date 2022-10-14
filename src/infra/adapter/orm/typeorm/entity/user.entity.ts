@@ -1,7 +1,8 @@
 import { User } from '@core/domain/user/user.model';
 import { UserProperties } from '@core/domain/user/user.type';
+import { Role } from '@core/enum/role.enum';
+import { CoreEntity } from '@infra/adapter/orm/typeorm/common/entity/core.entity';
 import { Column, Entity } from 'typeorm';
-import { CoreEntity } from '../common/entity/core.entity';
 
 @Entity('user')
 export class TypeOrmUser extends CoreEntity implements UserProperties {
@@ -16,6 +17,9 @@ export class TypeOrmUser extends CoreEntity implements UserProperties {
 
   @Column({ type: 'varchar', nullable: true, select: false })
   password: string | null;
+
+  @Column({ type: 'varchar' })
+  role: Role;
 
   static toEntity(model: User): TypeOrmUser {
     const properties = model.get();

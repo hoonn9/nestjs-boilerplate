@@ -1,4 +1,5 @@
 import { Identifier } from '@core/type/common';
+import { v4 } from 'uuid';
 
 export class CoreModel<ID extends Identifier> {
   protected readonly id: ID;
@@ -7,5 +8,9 @@ export class CoreModel<ID extends Identifier> {
 
   constructor(id: ID) {
     this.id = id;
+  }
+
+  public static newId() {
+    return v4();
   }
 }

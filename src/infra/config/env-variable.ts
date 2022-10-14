@@ -46,8 +46,10 @@ export class EnvironmentVariables {
 
   @Validate(IsNumberOrString)
   @Transform(({ value }) => {
-    const parsed = parseInt(value, 10);
-    return isNaN(parsed) ? value : parsed;
+    return isNaN(value) ? value : +value;
   })
   JWT_ACCESS_TOKEN_EXPIRES_IN: string | number;
+
+  @IsString()
+  JWT_ACCESS_TOKEN_KEY: string;
 }

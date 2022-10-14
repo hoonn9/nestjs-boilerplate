@@ -1,7 +1,10 @@
+import { Role } from '@core/enum/role.enum';
+
 export type UserRequiredProperties = Required<{
   readonly id: string;
   readonly email: string;
   readonly phoneNumber: string;
+  readonly role: Role;
 }>;
 
 export type UserPartialProperties = Partial<{
@@ -11,7 +14,7 @@ export type UserPartialProperties = Partial<{
   readonly updatedAt: Date;
 }>;
 
-export type UserConstructorProperties = Omit<UserRequiredProperties, 'id'> &
+export type UserConstructorProperties = UserRequiredProperties &
   UserPartialProperties;
 
 export type UserProperties = UserRequiredProperties &
