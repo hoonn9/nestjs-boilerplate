@@ -1,12 +1,12 @@
 import { UserInjectToken } from '@application/api/domain/user/user.token';
 import { CreateUserHandler } from '@core/domain/user/usecase/create-user/create-user.handler';
 import { CreateUserPort } from '@core/domain/user/usecase/create-user/create-user.port';
-import { UserRepositoryPort } from '@core/domain/user/user.repository';
+import { UserRepositoryPort } from '@core/domain/user/repository/user.repository';
 import { Provider } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { faker } from '@faker-js/faker';
-import { UserModelDto } from '@core/domain/user/user.dto';
-import { User } from '@core/domain/user/user.model';
+import { UserModelDto } from '@core/domain/user/dto/user.dto';
+import { User } from '@core/domain/user/entity/user.model';
 import { InfraInjectTokens } from '@infra/infra.token';
 import { CryptoHandler } from '@core/common/handler/crypto/crypto.handler';
 import { Role } from '@core/enum/role.enum';

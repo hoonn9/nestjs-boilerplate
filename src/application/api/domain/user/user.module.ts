@@ -9,7 +9,7 @@ import { getDataSourceToken } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { UserInjectToken } from './user.token';
 
-const persist: Provider[] = [
+const persists: Provider[] = [
   {
     provide: UserInjectToken.UserRepository,
     useFactory: (repo: DataSource) => {
@@ -23,7 +23,7 @@ const persist: Provider[] = [
   },
 ];
 
-const useCase: Provider[] = [
+const useCases: Provider[] = [
   {
     provide: UserInjectToken.CreateUserUseCase,
     useFactory: (userRepository, cryptoHandler) =>
@@ -35,6 +35,6 @@ const useCase: Provider[] = [
 @Module({
   imports: [],
   controllers: [UserController],
-  providers: [...persist, ...useCase],
+  providers: [...persists, ...useCases],
 })
 export class UserModule {}

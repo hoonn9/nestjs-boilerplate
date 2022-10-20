@@ -42,7 +42,7 @@ export class EnvironmentVariables {
   API_LOG_ENABLE: boolean | null;
 
   @IsString()
-  JWT_SECRET_KEY: string;
+  JWT_ACCESS_TOKEN_SECRET_KEY: string;
 
   @Validate(IsNumberOrString)
   @Transform(({ value }) => {
@@ -51,5 +51,17 @@ export class EnvironmentVariables {
   JWT_ACCESS_TOKEN_EXPIRES_IN: string | number;
 
   @IsString()
-  JWT_ACCESS_TOKEN_KEY: string;
+  JWT_ACCESS_TOKEN_NAME: string;
+
+  @IsString()
+  JWT_REFRESH_TOKEN_SECRET_KEY: string;
+
+  @Validate(IsNumberOrString)
+  @Transform(({ value }) => {
+    return isNaN(value) ? value : +value;
+  })
+  JWT_REFRESH_TOKEN_EXPIRES_IN: string | number;
+
+  @IsString()
+  JWT_REFRESH_TOKEN_NAME: string;
 }

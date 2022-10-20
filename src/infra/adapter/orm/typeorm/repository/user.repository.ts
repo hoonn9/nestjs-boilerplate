@@ -1,5 +1,5 @@
-import { User } from '@core/domain/user/user.model';
-import { UserRepositoryPort } from '@core/domain/user/user.repository';
+import { User } from '@core/domain/user/entity/user.model';
+import { UserRepositoryPort } from '@core/domain/user/repository/user.repository';
 import { Optional } from '@core/type/common';
 import { CoreRepository } from '@infra/adapter/orm/typeorm/common/repository/core.repository';
 import { TypeOrmUser } from '@infra/adapter/orm/typeorm/entity/user.entity';

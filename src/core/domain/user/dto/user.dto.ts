@@ -1,4 +1,4 @@
-import { User } from '@core/domain/user/user.model';
+import { User } from '@core/domain/user/entity/user.model';
 import { Exclude, plainToInstance } from 'class-transformer';
 import {
   IsDate,

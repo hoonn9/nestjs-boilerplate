@@ -1,25 +1,45 @@
 import { AuthController } from '@application/api/auth/auth.controller';
 import { AuthService } from '@application/api/auth/auth.service';
-import { JwtStrategy } from '@application/api/auth/strategy/auth-jwt.strategy';
+import { JwtAccessStrategy } from '@application/api/auth/strategy/auth-access-jwt.strategy';
 import { LocalStrategy } from '@application/api/auth/strategy/auth-local.strategy';
+import { JwtRefreshStrategy } from '@application/api/auth/strategy/auth-refresh-jwt.strategy';
 import { UserInjectToken } from '@application/api/domain/user/user.token';
+import { UpdateRefreshTokenHandler } from '@core/domain/user/usecase/update-refresh-token/update-refresh-token.handler';
 import { BcryptCryptoHandler } from '@infra/adapter/crypto/bcrypt/bcrypt.handler';
+import { TypeOrmRefreshToken } from '@infra/adapter/orm/typeorm/entity/refresh-token.entity';
 import { TypeOrmUser } from '@infra/adapter/orm/typeorm/entity/user.entity';
+import { TypeOrmRefreshTokenRepository } from '@infra/adapter/orm/typeorm/repository/refresh-token.repository';
 import { TypeOrmUserRepository } from '@infra/adapter/orm/typeorm/repository/user.repository';
-import { AuthConfig } from '@infra/config/auth/auth.config';
-import { Config } from '@infra/config/config';
 import { InfraInjectTokens } from '@infra/infra.token';
 import { Module, Provider } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { getDataSourceToken } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
-const persist: Provider[] = [
+const useCases: Provider[] = [
+  {
+    provide: UserInjectToken.UpdateRefreshTokenUseCase,
+    useFactory: (repo) => {
+      return new UpdateRefreshTokenHandler(repo);
+    },
+    inject: [UserInjectToken.RefreshTokenRepository],
+  },
+];
+
+const persists: Provider[] = [
   {
     provide: UserInjectToken.UserRepository,
-    useFactory: (repo: DataSource) => {
-      return new TypeOrmUserRepository(repo.getRepository(TypeOrmUser));
+    useFactory: (dataSource: DataSource) => {
+      return new TypeOrmUserRepository(dataSource.getRepository(TypeOrmUser));
+    },
+    inject: [getDataSourceToken()],
+  },
+  {
+    provide: UserInjectToken.RefreshTokenRepository,
+    useFactory: (dataSource: DataSource) => {
+      return new TypeOrmRefreshTokenRepository(
+        dataSource.getRepository(TypeOrmRefreshToken),
+      );
     },
     inject: [getDataSourceToken()],
   },
@@ -29,21 +49,15 @@ const persist: Provider[] = [
   },
 ];
 
-const strategies: Provider[] = [LocalStrategy, JwtStrategy];
+const strategies: Provider[] = [
+  LocalStrategy,
+  JwtAccessStrategy,
+  JwtRefreshStrategy,
+];
 
 @Module({
-  imports: [
-    JwtModule.registerAsync({
-      useFactory: (configService: ConfigService<Config>) => {
-        return {
-          secret: configService.getOrThrow<AuthConfig>('auth', { infer: true })
-            .jwt.secret,
-        };
-      },
-      inject: [ConfigService],
-    }),
-  ],
-  providers: [AuthService, ...persist, ...strategies],
+  imports: [JwtModule.register({})],
+  providers: [AuthService, ...persists, ...strategies, ...useCases],
   controllers: [AuthController],
 })
 export class AuthModule {}

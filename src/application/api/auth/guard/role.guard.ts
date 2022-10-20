@@ -1,4 +1,4 @@
-import { User } from '@core/domain/user/user.model';
+import { User } from '@core/domain/user/entity/user.model';
 import { Role } from '@core/enum/role.enum';
 import {
   CanActivate,

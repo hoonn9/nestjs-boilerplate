@@ -1,6 +1,7 @@
 import { AuthService } from '@application/api/auth/auth.service';
+import { AuthInjectToken } from '@application/api/auth/auth.token';
 import { JwtPayload } from '@application/api/auth/type/jwt-payload';
-import { User } from '@core/domain/user/user.model';
+import { User } from '@core/domain/user/entity/user.model';
 import { AuthConfig } from '@infra/config/auth/auth.config';
 import { Config } from '@infra/config/config';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
@@ -9,7 +10,10 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class JwtAccessStrategy extends PassportStrategy(
+  Strategy,
+  AuthInjectToken.JwtAccessTokenStrategy.toString(),
+) {
   constructor(
     private readonly authService: AuthService,
     private readonly configService: ConfigService<Config>,
@@ -17,18 +21,20 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (req) => {
-          const key = configService.getOrThrow<AuthConfig>('auth').jwt.key;
+          const name =
+            configService.getOrThrow<AuthConfig>('auth').jwt.access.cookieName;
 
-          return req.cookies?.[key];
+          return req.cookies?.[name];
         },
       ]),
       ignoreExpiration: false,
-      secretOrKey: configService.getOrThrow<AuthConfig>('auth').jwt.secret,
+      passReqToCallback: true,
+      secretOrKey:
+        configService.getOrThrow<AuthConfig>('auth').jwt.access.secret,
     });
   }
 
   public async validate(payload: JwtPayload): Promise<User> {
-    console.log(payload);
     const user = await this.authService.getUserByPayload(payload);
 
     if (!user) {

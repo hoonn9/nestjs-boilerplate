@@ -1,7 +1,8 @@
 import { IsNumberOrString } from '@core/common/decorator/validator/is-number-or-string';
+import { Type } from 'class-transformer';
 import { IsString, Validate } from 'class-validator';
 
-export class JwtConfig {
+export class JwtTokenConfig {
   @IsString()
   secret: string;
 
@@ -9,5 +10,13 @@ export class JwtConfig {
   expiresIn: string | number;
 
   @IsString()
-  key: string;
+  cookieName: string;
+}
+
+export class JwtConfig {
+  @Type(() => JwtTokenConfig)
+  access: JwtTokenConfig;
+
+  @Type(() => JwtTokenConfig)
+  refresh: JwtTokenConfig;
 }

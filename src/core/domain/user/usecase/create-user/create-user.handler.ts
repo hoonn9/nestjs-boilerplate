@@ -1,9 +1,9 @@
 import { CryptoHandler } from '@core/common/handler/crypto/crypto.handler';
 import { CreateUserPort } from '@core/domain/user/usecase/create-user/create-user.port';
-import { CreateUserUseCase } from '@core/domain/user/usecase/create-user/create-user.usercase';
-import { UserModelDto } from '@core/domain/user/user.dto';
-import { User } from '@core/domain/user/user.model';
-import { UserRepositoryPort } from '@core/domain/user/user.repository';
+import { CreateUserUseCase } from '@core/domain/user/usecase/create-user/create-user.usecase';
+import { UserModelDto } from '@core/domain/user/dto/user.dto';
+import { User } from '@core/domain/user/entity/user.model';
+import { UserRepositoryPort } from '@core/domain/user/repository/user.repository';
 import { Role } from '@core/enum/role.enum';
 import { BadRequestException } from '@nestjs/common';
 

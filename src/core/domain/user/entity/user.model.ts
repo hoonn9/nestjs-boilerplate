@@ -2,7 +2,7 @@ import { CoreModel } from '@core/common/model/core.model';
 import {
   UserConstructorProperties,
   UserProperties,
-} from '@core/domain/user/user.type';
+} from '@core/domain/user/type/user.type';
 import { Role } from '@core/enum/role.enum';
 
 export class User extends CoreModel<string> {
