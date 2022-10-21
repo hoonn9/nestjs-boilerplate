@@ -9,13 +9,11 @@ import {
 export class RefreshToken extends CoreModel<string> {
   private token: string;
   private user: User;
-  private userAgent: string;
 
   constructor(properties: RefreshTokenConstructorProperties) {
     super(properties.id);
 
     this.token = properties.token;
-    this.userAgent = properties.userAgent;
     this.user = properties.user;
   }
 
@@ -23,7 +21,6 @@ export class RefreshToken extends CoreModel<string> {
     return {
       id: this.id,
       token: this.token,
-      userAgent: this.userAgent,
       user: this.user,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
@@ -33,10 +30,6 @@ export class RefreshToken extends CoreModel<string> {
   update(properties: RefreshTokenUpdateProperties) {
     if (properties.token) {
       this.token = properties.token;
-    }
-
-    if (properties.userAgent) {
-      this.userAgent = properties.userAgent;
     }
   }
 

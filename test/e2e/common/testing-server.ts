@@ -6,6 +6,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { Config } from '@infra/config/config';
 import { HttpExceptionFilter } from '@application/api/common/exception-filter/http.exception-filter';
+import * as cookieParser from 'cookie-parser';
 
 export class TestingServer {
   constructor(
@@ -20,6 +21,7 @@ export class TestingServer {
     const app: NestApplication = module.createNestApplication();
 
     const configService: ConfigService<Config> = app.get(ConfigService);
+    app.use(cookieParser());
     app.useGlobalFilters(new HttpExceptionFilter(configService));
 
     return new TestingServer(module, app);

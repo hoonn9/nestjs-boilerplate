@@ -3,7 +3,6 @@ import { User } from '@core/domain/user/entity/user.model';
 export type RefreshTokenRequiredProperties = Required<{
   readonly id: string;
   readonly token: string;
-  readonly userAgent: string;
   readonly user: User;
 }>;
 
@@ -19,5 +18,5 @@ export type RefreshTokenProperties = RefreshTokenRequiredProperties &
   Required<RefreshTokenPartialProperties>;
 
 export type RefreshTokenUpdateProperties = Partial<
-  Pick<RefreshTokenRequiredProperties, 'token' | 'userAgent'>
+  Pick<RefreshTokenRequiredProperties, 'token'>
 >;

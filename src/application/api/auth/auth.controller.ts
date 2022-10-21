@@ -1,6 +1,7 @@
 import { AuthService } from '@application/api/auth/auth.service';
-import { AuthInjectToken } from '@application/api/auth/auth.token';
+import { AuthLocalGuard } from '@application/api/auth/guard/auth-local.guard';
 import { JwtRefreshGuard } from '@application/api/auth/guard/jwt-refresh.guard';
+import { JwtToken } from '@application/api/auth/type/jwt.type';
 import { UserModelDto } from '@core/domain/user/dto/user.dto';
 import { User } from '@core/domain/user/entity/user.model';
 import {
@@ -12,14 +13,13 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @UseGuards(AuthGuard(AuthInjectToken.LocalStrategy.toString()))
+  @UseGuards(AuthLocalGuard)
   @HttpCode(HttpStatus.OK)
   @Post('login')
   async login(
@@ -30,6 +30,13 @@ export class AuthController {
   }
 
   @UseGuards(JwtRefreshGuard)
+  @HttpCode(HttpStatus.OK)
   @Post('refresh')
-  async refresh() {}
+  async refresh(
+    @Req() req: Express.Request & { refresh: JwtToken },
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    this.authService.setRefreshToken(res, req.refresh);
+    return 'ok';
+  }
 }

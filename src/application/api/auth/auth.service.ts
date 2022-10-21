@@ -1,4 +1,4 @@
-import { JwtPayload } from '@application/api/auth/type/jwt-payload';
+import { JwtPayload, JwtToken } from '@application/api/auth/type/jwt.type';
 import { UserInjectToken } from '@application/api/domain/user/user.token';
 import { CryptoHandler } from '@core/common/handler/crypto/crypto.handler';
 import { UserModelDto } from '@core/domain/user/dto/user.dto';
@@ -7,18 +7,23 @@ import { RefreshTokenRepositoryPort } from '@core/domain/user/repository/refresh
 import { UserRepositoryPort } from '@core/domain/user/repository/user.repository';
 import { UpdateRefreshTokenUseCase } from '@core/domain/user/usecase/update-refresh-token/update-refresh-token.usecase';
 import { AuthConfig } from '@infra/config/auth/auth.config';
+import { JwtConfig } from '@infra/config/auth/jwt/jwt.config';
 import { Config } from '@infra/config/config';
 import { InfraInjectTokens } from '@infra/infra.token';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 
 @Injectable()
 export class AuthService {
+  private readonly authConfig: AuthConfig;
   constructor(
     @Inject(UserInjectToken.UserRepository)
     private readonly userRepository: UserRepositoryPort,
+
+    @Inject(UserInjectToken.RefreshTokenRepository)
+    private readonly refreshTokenRepository: RefreshTokenRepositoryPort,
 
     @Inject(UserInjectToken.UpdateRefreshTokenUseCase)
     private readonly updateRefreshTokenUseCase: UpdateRefreshTokenUseCase,
@@ -28,7 +33,14 @@ export class AuthService {
 
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService<Config>,
-  ) {}
+  ) {
+    this.authConfig = this.getAuthConfig();
+    console.log('authConfig', this.authConfig);
+  }
+
+  getAuthConfig() {
+    return this.configService.getOrThrow<AuthConfig>('auth');
+  }
 
   async validateUser(email: string, password: string) {
     const user = await this.userRepository.findByEmailWithPassword(email);
@@ -60,30 +72,82 @@ export class AuthService {
       id: user.get().id,
     };
 
-    const authConfig = this.configService.getOrThrow<AuthConfig>('auth');
+    const newAccessToken = this.generateToken(payload, 'access');
+    const newRefreshToken = this.generateToken(payload, 'refresh');
 
-    res.cookie(
-      authConfig.jwt.access.cookieName,
-      this.jwtService.sign(payload, {
-        secret: authConfig.jwt.access.secret,
-        expiresIn: authConfig.jwt.access.expiresIn,
-      }),
-      {},
-    );
+    await this.updateRefreshTokenUseCase.execute({
+      newToken: newRefreshToken,
+      user,
+    });
 
-    res.cookie(
-      authConfig.jwt.refresh.cookieName,
-      this.jwtService.sign(payload, {
-        secret: authConfig.jwt.refresh.secret,
-        expiresIn: authConfig.jwt.refresh.expiresIn,
-      }),
-      {},
-    );
+    this.setRefreshToken(res, {
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
+    });
 
     return UserModelDto.fromModel(user);
   }
 
+  async refreshTokens(
+    payload: JwtPayload,
+    req: Request,
+  ): Promise<[JwtToken, User]> {
+    const user = await this.userRepository.findById(payload.id);
+
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
+    const token: string = req.cookies[this.authConfig.jwt.refresh.cookieName];
+
+    const refreshTokenModel = await this.refreshTokenRepository.findByToken({
+      user,
+      token,
+    });
+
+    if (!refreshTokenModel) {
+      throw new UnauthorizedException();
+    }
+
+    const newPayload = {
+      id: payload.id,
+    };
+
+    const newAccessToken = this.generateToken(newPayload, 'access');
+    const newRefreshToken = this.generateToken(newPayload, 'refresh');
+
+    await this.updateRefreshTokenUseCase.execute({
+      token,
+      newToken: newRefreshToken,
+      user,
+    });
+
+    return [
+      {
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      },
+      user,
+    ];
+  }
+
   async getUserByPayload(payload: JwtPayload) {
     return this.userRepository.findById(payload.id);
+  }
+
+  setRefreshToken(res: Response, tokens: JwtToken) {
+    this.setCookieToken(res, tokens.accessToken, 'access');
+    this.setCookieToken(res, tokens.refreshToken, 'refresh');
+  }
+
+  private setCookieToken(res: Response, token: string, type: keyof JwtConfig) {
+    res.cookie(this.authConfig.jwt[type].cookieName, token, {});
+  }
+
+  private generateToken(payload: JwtPayload, type: keyof JwtConfig) {
+    return this.jwtService.sign(payload, {
+      secret: this.authConfig.jwt[type].secret,
+      expiresIn: this.authConfig.jwt[type].expiresIn,
+    });
   }
 }

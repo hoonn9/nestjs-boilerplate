@@ -8,21 +8,24 @@ export class UpdateRefreshTokenHandler {
   ) {}
 
   async execute(port: UpdateRefreshTokenPort) {
-    let refreshToken = await this.refreshTokenRepository.findByUserAgent({
-      user: port.user,
-      userAgent: port.userAgent,
-    });
+    let refreshToken: RefreshToken | null = null;
+
+    if (port.token) {
+      refreshToken = await this.refreshTokenRepository.findByToken({
+        user: port.user,
+        token: port.token,
+      });
+    }
 
     if (refreshToken) {
       refreshToken.update({
-        token: port.token,
+        token: port.newToken,
       });
     } else {
       refreshToken = new RefreshToken({
         id: RefreshToken.newId(),
-        token: port.token,
+        token: port.newToken,
         user: port.user,
-        userAgent: port.userAgent,
       });
     }
 

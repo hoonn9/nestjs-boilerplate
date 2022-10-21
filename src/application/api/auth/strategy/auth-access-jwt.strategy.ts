@@ -1,6 +1,6 @@
 import { AuthService } from '@application/api/auth/auth.service';
 import { AuthInjectToken } from '@application/api/auth/auth.token';
-import { JwtPayload } from '@application/api/auth/type/jwt-payload';
+import { JwtPayload } from '@application/api/auth/type/jwt.type';
 import { User } from '@core/domain/user/entity/user.model';
 import { AuthConfig } from '@infra/config/auth/auth.config';
 import { Config } from '@infra/config/config';
@@ -28,7 +28,6 @@ export class JwtAccessStrategy extends PassportStrategy(
         },
       ]),
       ignoreExpiration: false,
-      passReqToCallback: true,
       secretOrKey:
         configService.getOrThrow<AuthConfig>('auth').jwt.access.secret,
     });

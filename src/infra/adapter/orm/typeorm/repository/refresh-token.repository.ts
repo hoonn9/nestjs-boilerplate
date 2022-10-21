@@ -18,14 +18,14 @@ export class TypeOrmRefreshTokenRepository
   ) {
     super(refreshTokenRepository);
   }
-  async findByUserAgent(args: {
+  async findByToken(args: {
     user: User;
-    userAgent: any;
+    token: string;
   }): Promise<Optional<RefreshToken>> {
     const entity = await this.refreshTokenRepository.findOne({
       where: {
         userId: args.user.get().id,
-        userAgent: args.userAgent,
+        token: args.token,
       },
       relations: {
         user: true,

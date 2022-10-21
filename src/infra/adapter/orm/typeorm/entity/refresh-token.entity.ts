@@ -13,9 +13,6 @@ import {
 
 @Entity('refresh_token')
 export class TypeOrmRefreshToken extends CoreEntity {
-  @Column({ type: 'varchar' })
-  userAgent: string;
-
   @RelationId((type: TypeOrmRefreshToken) => type.user)
   @Column({ type: 'uuid' })
   userId: string;
