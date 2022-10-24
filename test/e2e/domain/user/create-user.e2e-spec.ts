@@ -1,16 +1,16 @@
-import { RootModule } from '@application/root.module';
+import { UserModelDto } from '@core/domain/user/dto/user.dto';
 import { faker } from '@faker-js/faker';
 import { HttpStatus } from '@nestjs/common';
 import { TestingServer } from '@test/e2e/common/testing-server';
+import { plainToInstance } from 'class-transformer';
+import { validate } from 'class-validator';
 import * as supertest from 'supertest';
 
 describe('CreateUser E2E', () => {
   let testingServer: TestingServer;
 
   beforeAll(async () => {
-    testingServer = await TestingServer.new({
-      imports: [RootModule],
-    });
+    testingServer = await TestingServer.new();
 
     await testingServer.application.init();
   });
@@ -21,7 +21,9 @@ describe('CreateUser E2E', () => {
 
   describe('POST /user', () => {
     it('When create user, expect it returns CreateUserDto', async () => {
-      const res = await supertest(testingServer.application.getHttpServer())
+      const loginUserRes = await supertest(
+        testingServer.application.getHttpServer(),
+      )
         .post('/user')
         .send({
           email: faker.internet.email(),
@@ -29,8 +31,10 @@ describe('CreateUser E2E', () => {
           phoneNumber: faker.phone.number('###-####-####'),
         });
 
-      expect(res.status).toBe(HttpStatus.CREATED);
-      expect(res.body).toHaveProperty('id');
+      expect(loginUserRes.status).toBe(HttpStatus.CREATED);
+
+      const loginUserDto = plainToInstance(UserModelDto, loginUserRes.body);
+      expect(validate(loginUserDto)).resolves.toHaveLength(0);
     });
   });
 });

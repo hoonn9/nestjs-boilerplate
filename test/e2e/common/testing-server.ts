@@ -1,12 +1,18 @@
 import { InfraInjectTokens } from '@infra/infra.token';
 import { DatabaseHandler } from '@core/common/handler/database/database.handler';
-import { ModuleMetadata } from '@nestjs/common';
 import { NestApplication } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { Config } from '@infra/config/config';
 import { HttpExceptionFilter } from '@application/api/common/exception-filter/http.exception-filter';
 import * as cookieParser from 'cookie-parser';
+import { RootModule } from '@application/root.module';
+
+const defaultModule = () => {
+  return Test.createTestingModule({
+    imports: [RootModule],
+  }).compile();
+};
 
 export class TestingServer {
   constructor(
@@ -14,10 +20,11 @@ export class TestingServer {
     public readonly application: NestApplication,
   ) {}
 
-  public static async new(metadata: ModuleMetadata) {
-    const module: TestingModule = await Test.createTestingModule(
-      metadata,
-    ).compile();
+  static async new(module?: TestingModule) {
+    if (!module) {
+      module = await defaultModule();
+    }
+
     const app: NestApplication = module.createNestApplication();
 
     const configService: ConfigService<Config> = app.get(ConfigService);
@@ -27,7 +34,7 @@ export class TestingServer {
     return new TestingServer(module, app);
   }
 
-  public async finishTest() {
+  async finishTest() {
     const dbHandler = this.testingModule.get<DatabaseHandler>(
       InfraInjectTokens.DatabaseHandler,
     );

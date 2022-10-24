@@ -9,11 +9,12 @@ import { UpdateRefreshTokenUseCase } from '@core/domain/user/usecase/update-refr
 import { AuthConfig } from '@infra/config/auth/auth.config';
 import { JwtConfig } from '@infra/config/auth/jwt/jwt.config';
 import { Config } from '@infra/config/config';
+import { Environment } from '@infra/config/env-variable';
 import { InfraInjectTokens } from '@infra/infra.token';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { Request, Response } from 'express';
+import { CookieOptions, Request, Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -34,12 +35,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService<Config>,
   ) {
-    this.authConfig = this.getAuthConfig();
-    console.log('authConfig', this.authConfig);
-  }
-
-  getAuthConfig() {
-    return this.configService.getOrThrow<AuthConfig>('auth');
+    this.authConfig = this.configService.getOrThrow<AuthConfig>('auth');
   }
 
   async validateUser(email: string, password: string) {
@@ -108,7 +104,6 @@ export class AuthService {
     if (!refreshTokenModel) {
       throw new UnauthorizedException();
     }
-
     const newPayload = {
       id: payload.id,
     };
@@ -141,7 +136,19 @@ export class AuthService {
   }
 
   private setCookieToken(res: Response, token: string, type: keyof JwtConfig) {
-    res.cookie(this.authConfig.jwt[type].cookieName, token, {});
+    res.cookie(
+      this.authConfig.jwt[type].cookieName,
+      token,
+      this.getCookieOptions(),
+    );
+  }
+
+  private getCookieOptions(): CookieOptions {
+    return {
+      httpOnly: true,
+      secure:
+        this.configService.getOrThrow('NODE_ENV') === Environment.Production,
+    };
   }
 
   private generateToken(payload: JwtPayload, type: keyof JwtConfig) {
