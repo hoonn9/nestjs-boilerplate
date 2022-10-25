@@ -1,4 +1,3 @@
-import { CryptoHandler } from '@core/common/handler/crypto/crypto.handler';
 import { CreateUserPort } from '@core/domain/user/usecase/create-user/create-user.port';
 import { CreateUserUseCase } from '@core/domain/user/usecase/create-user/create-user.usecase';
 import { UserModelDto } from '@core/domain/user/dto/user.dto';
@@ -6,11 +5,12 @@ import { User } from '@core/domain/user/entity/user.model';
 import { UserRepositoryPort } from '@core/domain/user/repository/user.repository';
 import { Role } from '@core/enum/role.enum';
 import { BadRequestException } from '@nestjs/common';
+import { CryptoService } from '@core/crypto/crypto.service';
 
 export class CreateUserHandler implements CreateUserUseCase {
   constructor(
     private readonly userRepository: UserRepositoryPort,
-    private readonly cryptoHandler: CryptoHandler,
+    private readonly cryptoService: CryptoService,
   ) {}
 
   async execute(port: CreateUserPort): Promise<UserModelDto> {
@@ -28,7 +28,7 @@ export class CreateUserHandler implements CreateUserUseCase {
     let password: string | null = null;
 
     if (port.password) {
-      password = await this.cryptoHandler.hash(port.password);
+      password = await this.cryptoService.hash(port.password, 10);
     }
 
     const userModel = new User({

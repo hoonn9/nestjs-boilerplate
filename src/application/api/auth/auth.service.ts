@@ -1,6 +1,6 @@
 import { JwtPayload, JwtToken } from '@application/api/auth/type/jwt.type';
 import { UserInjectToken } from '@application/api/domain/user/user.token';
-import { CryptoHandler } from '@core/common/handler/crypto/crypto.handler';
+import { CryptoService } from '@core/crypto/crypto.service';
 import { UserModelDto } from '@core/domain/user/dto/user.dto';
 import { User } from '@core/domain/user/entity/user.model';
 import { RefreshTokenRepositoryPort } from '@core/domain/user/repository/refresh-token.repository';
@@ -10,7 +10,6 @@ import { AuthConfig } from '@infra/config/auth/auth.config';
 import { JwtConfig } from '@infra/config/auth/jwt/jwt.config';
 import { Config } from '@infra/config/config';
 import { Environment } from '@infra/config/env-variable';
-import { InfraInjectTokens } from '@infra/infra.token';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -29,9 +28,7 @@ export class AuthService {
     @Inject(UserInjectToken.UpdateRefreshTokenUseCase)
     private readonly updateRefreshTokenUseCase: UpdateRefreshTokenUseCase,
 
-    @Inject(InfraInjectTokens.CryptoHandler)
-    private readonly cryptoHandler: CryptoHandler,
-
+    private readonly cryptoService: CryptoService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService<Config>,
   ) {
@@ -51,7 +48,7 @@ export class AuthService {
       return null;
     }
 
-    const validate = await this.cryptoHandler.compare(
+    const validate = await this.cryptoService.compare(
       password,
       properties.password,
     );
@@ -72,7 +69,7 @@ export class AuthService {
     const newRefreshToken = this.generateToken(payload, 'refresh');
 
     await this.updateRefreshTokenUseCase.execute({
-      newToken: newRefreshToken,
+      newToken: await this.encryptToken(newRefreshToken),
       user,
     });
 
@@ -98,7 +95,7 @@ export class AuthService {
 
     const refreshTokenModel = await this.refreshTokenRepository.findByToken({
       user,
-      token,
+      token: await this.encryptToken(token),
     });
 
     if (!refreshTokenModel) {
@@ -111,9 +108,10 @@ export class AuthService {
     const newAccessToken = this.generateToken(newPayload, 'access');
     const newRefreshToken = this.generateToken(newPayload, 'refresh');
 
+    // Refresh Token Rotation
     await this.updateRefreshTokenUseCase.execute({
       token,
-      newToken: newRefreshToken,
+      newToken: await this.encryptToken(newRefreshToken),
       user,
     });
 
@@ -133,6 +131,12 @@ export class AuthService {
   setRefreshToken(res: Response, tokens: JwtToken) {
     this.setCookieToken(res, tokens.accessToken, 'access');
     this.setCookieToken(res, tokens.refreshToken, 'refresh');
+  }
+
+  private async encryptToken(token: string) {
+    return this.cryptoService.encrypt(token, {
+      secret: this.configService.getOrThrow('CRYPTO_AES256_SECRET_KEY'),
+    });
   }
 
   private setCookieToken(res: Response, token: string, type: keyof JwtConfig) {

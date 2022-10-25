@@ -22,7 +22,7 @@ export class TypeOrmRefreshToken extends CoreEntity {
   @JoinColumn({ name: 'userId', referencedColumnName: 'id' })
   user: TypeOrmUser | null;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'text' })
   token: string;
 
   static toEntity(model: RefreshToken): TypeOrmRefreshToken {

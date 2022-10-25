@@ -7,8 +7,7 @@ import { Test } from '@nestjs/testing';
 import { faker } from '@faker-js/faker';
 import { UserModelDto } from '@core/domain/user/dto/user.dto';
 import { User } from '@core/domain/user/entity/user.model';
-import { InfraInjectTokens } from '@infra/infra.token';
-import { CryptoHandler } from '@core/common/handler/crypto/crypto.handler';
+import { CryptoService } from '@core/crypto/crypto.service';
 import { Role } from '@core/enum/role.enum';
 
 const providers: Provider[] = [
@@ -16,16 +15,16 @@ const providers: Provider[] = [
     provide: UserInjectToken.CreateUserUseCase,
     useFactory: (
       userRepository: UserRepositoryPort,
-      cryptoHandler: CryptoHandler,
-    ) => new CreateUserHandler(userRepository, cryptoHandler),
-    inject: [UserInjectToken.UserRepository, InfraInjectTokens.CryptoHandler],
+      cryptoService: CryptoService,
+    ) => new CreateUserHandler(userRepository, cryptoService),
+    inject: [UserInjectToken.UserRepository, CryptoService],
   },
   {
     provide: UserInjectToken.UserRepository,
     useValue: {},
   },
   {
-    provide: InfraInjectTokens.CryptoHandler,
+    provide: CryptoService,
     useValue: {},
   },
 ];
@@ -33,7 +32,7 @@ const providers: Provider[] = [
 describe('CreateUserHandler', () => {
   let userRepository: UserRepositoryPort;
   let createUserHandler: CreateUserHandler;
-  let cryptoHandler: CryptoHandler;
+  let cryptoService: CryptoService;
 
   beforeAll(async () => {
     const module = await Test.createTestingModule({
@@ -42,7 +41,7 @@ describe('CreateUserHandler', () => {
 
     userRepository = module.get(UserInjectToken.UserRepository);
     createUserHandler = module.get(UserInjectToken.CreateUserUseCase);
-    cryptoHandler = module.get(InfraInjectTokens.CryptoHandler);
+    cryptoService = module.get(CryptoService);
   });
 
   describe('execute', () => {
@@ -54,7 +53,7 @@ describe('CreateUserHandler', () => {
         id,
       });
 
-      cryptoHandler.hash = jest.fn().mockResolvedValue('password');
+      cryptoService.hash = jest.fn().mockResolvedValue('password');
 
       const port: CreateUserPort = {
         email: faker.internet.email(),
