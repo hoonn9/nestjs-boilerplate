@@ -8,6 +8,7 @@ import { User } from '@core/domain/user/entity/user.model';
 import { Role } from '@core/enum/role.enum';
 import { CreateUserAdapter } from '@infra/adapter/usecase/user/create-user.adapter';
 import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
+import { ApiResponse } from '@application/api/common/dto/api-response.dto';
 
 @Controller('user')
 export class UserController {
@@ -17,14 +18,16 @@ export class UserController {
   ) {}
 
   @Post()
-  async createUser(@Body() body: CreateUserBodyDto): Promise<UserModelDto> {
+  async createUser(
+    @Body() body: CreateUserBodyDto,
+  ): Promise<ApiResponse<UserModelDto>> {
     const port = await CreateUserAdapter.toPort(body);
-    return this.createUserUseCase.execute(port);
+    return ApiResponse.success(await this.createUserUseCase.execute(port));
   }
 
   @Auth(Role.USER)
   @Get('me')
-  async getMe(@CurrentUser() user: User) {
-    return UserModelDto.fromModel(user);
+  async getMe(@CurrentUser() user: User): Promise<ApiResponse<UserModelDto>> {
+    return ApiResponse.success(UserModelDto.fromModel(user));
   }
 }

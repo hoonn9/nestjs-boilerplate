@@ -1,4 +1,4 @@
-import { CoreApiResponse } from '@core/api/core-api-response';
+import { ApiResponse } from '@application/api/common/dto/api-response.dto';
 import { ValidationException } from '@core/common/exception/validation.exception';
 import { Config } from '@infra/config/config';
 import {
@@ -18,41 +18,36 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
   catch(exception: HttpException, host: ArgumentsHost) {
     const httpHost = host.switchToHttp();
-
     const res: Response = httpHost.getResponse();
-    const isLogging = this.configService.get('API_LOG_ENABLE');
 
-    if (isLogging) {
-      Logger.error(`[${exception.getStatus()}] ${exception.message}`);
-    }
+    this.logging(exception);
 
-    const errRes = this.errorResponse(exception, isLogging);
+    const errorResponse = ApiResponse.error(exception);
 
-    res.status(errRes.statusCode).json({
-      statusCode: errRes.statusCode,
-      message: errRes.message,
-      data: errRes.data,
-    });
+    res.status(errorResponse.statusCode).json(errorResponse);
   }
 
-  private errorResponse(exception: HttpException, isLogging: boolean) {
-    if (exception instanceof ValidationException) {
-      const response = exception.getResponse() as {
-        message: ValidationError[];
-      };
+  private logging(exception: HttpException) {
+    if (this.configService.get('API_LOG_ENABLE')) {
+      this.defaultLogging(exception);
 
-      if (isLogging) {
-        for (const msg of response.message) {
-          Logger.error(msg);
-        }
+      if (exception instanceof ValidationException) {
+        this.validationLogging(exception);
       }
-
-      return new CoreApiResponse<ValidationError[]>(
-        exception.getStatus(),
-        exception.message,
-        response.message,
-      );
     }
-    return new CoreApiResponse(exception.getStatus(), exception.message, null);
+  }
+
+  private defaultLogging(exception: HttpException) {
+    Logger.error(`[${exception.getStatus()}] ${exception.message}`);
+  }
+
+  private validationLogging(exception: ValidationException) {
+    const response = exception.getResponse() as {
+      message: ValidationError[];
+    };
+
+    for (const msg of response.message) {
+      Logger.error(msg);
+    }
   }
 }

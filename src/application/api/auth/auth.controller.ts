@@ -2,6 +2,7 @@ import { AuthService } from '@application/api/auth/auth.service';
 import { AuthLocalGuard } from '@application/api/auth/guard/auth-local.guard';
 import { JwtRefreshGuard } from '@application/api/auth/guard/jwt-refresh.guard';
 import { JwtToken } from '@application/api/auth/type/jwt.type';
+import { ApiResponse } from '@application/api/common/dto/api-response.dto';
 import { UserModelDto } from '@core/domain/user/dto/user.dto';
 import { User } from '@core/domain/user/entity/user.model';
 import {
@@ -25,8 +26,8 @@ export class AuthController {
   async login(
     @Req() req: Express.Request & { user: User },
     @Res({ passthrough: true }) res: Response,
-  ): Promise<UserModelDto> {
-    return this.authService.login(req.user, res);
+  ): Promise<ApiResponse<UserModelDto>> {
+    return ApiResponse.success(await this.authService.login(req.user, res));
   }
 
   @UseGuards(JwtRefreshGuard)
@@ -35,8 +36,8 @@ export class AuthController {
   async refresh(
     @Req() req: Express.Request & { refresh: JwtToken },
     @Res({ passthrough: true }) res: Response,
-  ) {
+  ): Promise<ApiResponse<void>> {
     this.authService.setRefreshToken(res, req.refresh);
-    return 'ok';
+    return ApiResponse.success(null);
   }
 }

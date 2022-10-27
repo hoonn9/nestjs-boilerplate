@@ -24,7 +24,7 @@ const useCases: Provider[] = [
     provide: UserInjectToken.CreateUserUseCase,
     useFactory: (userRepository, cryptoService) =>
       new CreateUserHandler(userRepository, cryptoService),
-    inject: [UserInjectToken.UserRepository],
+    inject: [UserInjectToken.UserRepository, CryptoService],
   },
 ];
 
