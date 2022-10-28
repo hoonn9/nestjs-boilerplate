@@ -64,4 +64,13 @@ export class EnvironmentVariables {
 
   @IsString()
   JWT_REFRESH_TOKEN_NAME: string;
+
+  @IsString()
+  CRYPTO_AES256_SECRET_KEY: string;
+
+  @IsBooleanString()
+  OPEN_API_DOCS_ENABLE: string;
+
+  @IsString()
+  OPEN_API_DOCS_PATH: string;
 }

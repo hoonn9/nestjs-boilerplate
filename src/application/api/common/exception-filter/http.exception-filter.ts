@@ -28,7 +28,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
   }
 
   private logging(exception: HttpException) {
-    if (this.configService.get('API_LOG_ENABLE')) {
+    if (this.configService.get('API_LOG_ENABLE') === 'true') {
       this.defaultLogging(exception);
 
       if (exception instanceof ValidationException) {
