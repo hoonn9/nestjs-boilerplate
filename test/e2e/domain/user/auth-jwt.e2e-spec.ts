@@ -57,7 +57,11 @@ describe('AuthJwt E2E', () => {
         });
 
       expect(joinUserRes.status).toBe(HttpStatus.CREATED);
-      expect(joinUserRes.body).toHaveProperty('id');
+      expect(joinUserRes.body.statusCode).toBe(HttpStatus.CREATED);
+
+      const joinUserDto = plainToInstance(UserModelDto, joinUserRes.body.data);
+
+      expect(validate(joinUserDto)).resolves.toHaveLength(0);
     });
 
     it('When login user, expect it returns UserModelDto and set-cookie with accessToken and refreshToken in response header', async () => {
@@ -69,8 +73,12 @@ describe('AuthJwt E2E', () => {
         });
 
       expect(loginUserRes.status).toBe(HttpStatus.OK);
+      expect(loginUserRes.body.statusCode).toBe(HttpStatus.OK);
 
-      const loginUserDto = plainToInstance(UserModelDto, loginUserRes.body);
+      const loginUserDto = plainToInstance(
+        UserModelDto,
+        loginUserRes.body.data,
+      );
       expect(validate(loginUserDto)).resolves.toHaveLength(0);
     });
 
@@ -83,6 +91,7 @@ describe('AuthJwt E2E', () => {
         .withCredentials();
 
       expect(getUserMeRes.status).toBe(HttpStatus.UNAUTHORIZED);
+      expect(getUserMeRes.body.statusCode).toBe(HttpStatus.UNAUTHORIZED);
     });
 
     it('When refreshToken, expect it returns new access token and new refresh token', async () => {
@@ -97,6 +106,7 @@ describe('AuthJwt E2E', () => {
         .withCredentials();
 
       expect(refreshTokenRes.status).toBe(HttpStatus.OK);
+      expect(refreshTokenRes.body.statusCode).toBe(HttpStatus.OK);
 
       const prevCookies = getSetCookies(loginUserRes);
       const newCookies = getSetCookies(refreshTokenRes);

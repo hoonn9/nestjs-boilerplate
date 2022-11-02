@@ -53,7 +53,7 @@ describe('CreateUserHandler', () => {
         id,
       });
 
-      cryptoService.hash = jest.fn().mockResolvedValue('password');
+      cryptoService.hashByBcrypt = jest.fn().mockResolvedValue('password');
 
       const port: CreateUserPort = {
         email: faker.internet.email(),

@@ -7,7 +7,15 @@ import { UserModelDto } from '@core/domain/user/dto/user.dto';
 import { User } from '@core/domain/user/entity/user.model';
 import { Role } from '@core/enum/role.enum';
 import { CreateUserAdapter } from '@infra/adapter/usecase/user/create-user.adapter';
-import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Inject,
+  Post,
+} from '@nestjs/common';
 import { ApiResponse } from '@application/api/common/dto/api-response.dto';
 
 @Controller('user')
@@ -17,12 +25,17 @@ export class UserController {
     private readonly createUserUseCase: CreateUserUseCase,
   ) {}
 
+  @HttpCode(HttpStatus.CREATED)
   @Post()
   async createUser(
     @Body() body: CreateUserBodyDto,
   ): Promise<ApiResponse<UserModelDto>> {
     const port = await CreateUserAdapter.toPort(body);
-    return ApiResponse.success(await this.createUserUseCase.execute(port));
+    return ApiResponse.success(
+      await this.createUserUseCase.execute(port),
+      undefined,
+      HttpStatus.CREATED,
+    );
   }
 
   @Auth(Role.USER)

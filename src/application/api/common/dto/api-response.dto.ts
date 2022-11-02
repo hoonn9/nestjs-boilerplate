@@ -1,5 +1,5 @@
 import { ValidationException } from '@core/common/exception/validation.exception';
-import { HttpException } from '@nestjs/common';
+import { HttpException, HttpStatus } from '@nestjs/common';
 import { ValidationError } from 'class-validator';
 
 export class ApiResponse<TData> {
@@ -9,8 +9,12 @@ export class ApiResponse<TData> {
     readonly data: TData | null = null,
   ) {}
 
-  static success<TData>(data?: TData, message?: string) {
-    return new ApiResponse(200, message || 'ok', data);
+  static success<TData>(
+    data?: TData,
+    message?: string,
+    statusCode: HttpStatus = HttpStatus.OK,
+  ) {
+    return new ApiResponse(statusCode, message || 'ok', data);
   }
 
   static error(exception: HttpException) {

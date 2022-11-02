@@ -1,4 +1,8 @@
-import { JwtPayload, JwtToken } from '@application/api/auth/type/jwt.type';
+import {
+  JwtPayload,
+  JwtToken,
+  JwtType,
+} from '@application/api/auth/type/jwt.type';
 import { UserInjectToken } from '@application/api/domain/user/user.token';
 import { CryptoService } from '@core/crypto/crypto.service';
 import { UserModelDto } from '@core/domain/user/dto/user.dto';
@@ -7,7 +11,6 @@ import { RefreshTokenRepositoryPort } from '@core/domain/user/repository/refresh
 import { UserRepositoryPort } from '@core/domain/user/repository/user.repository';
 import { UpdateRefreshTokenUseCase } from '@core/domain/user/usecase/update-refresh-token/update-refresh-token.usecase';
 import { AuthConfig } from '@infra/config/auth/auth.config';
-import { JwtConfig } from '@infra/config/auth/jwt/jwt.config';
 import { Config } from '@infra/config/config';
 import { Environment } from '@infra/config/env-variable';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
@@ -48,7 +51,7 @@ export class AuthService {
       return null;
     }
 
-    const validate = await this.cryptoService.compare(
+    const validate = await this.cryptoService.compareByBcrypt(
       password,
       properties.password,
     );
@@ -69,7 +72,7 @@ export class AuthService {
     const newRefreshToken = this.generateToken(payload, 'refresh');
 
     await this.updateRefreshTokenUseCase.execute({
-      newToken: await this.encryptToken(newRefreshToken),
+      newToken: await this.hashToken(newRefreshToken),
       user,
     });
 
@@ -95,7 +98,7 @@ export class AuthService {
 
     const refreshTokenModel = await this.refreshTokenRepository.findByToken({
       user,
-      token: await this.encryptToken(token),
+      token: await this.hashToken(token),
     });
 
     if (!refreshTokenModel) {
@@ -111,7 +114,7 @@ export class AuthService {
     // Refresh Token Rotation
     await this.updateRefreshTokenUseCase.execute({
       token,
-      newToken: await this.encryptToken(newRefreshToken),
+      newToken: await this.hashToken(newRefreshToken),
       user,
     });
 
@@ -133,13 +136,11 @@ export class AuthService {
     this.setCookieToken(res, tokens.refreshToken, 'refresh');
   }
 
-  private async encryptToken(token: string) {
-    return this.cryptoService.encrypt(token, {
-      secret: this.configService.getOrThrow('CRYPTO_AES256_SECRET_KEY'),
-    });
+  private async hashToken(token: string) {
+    return this.cryptoService.hashBySha256(token);
   }
 
-  private setCookieToken(res: Response, token: string, type: keyof JwtConfig) {
+  private setCookieToken(res: Response, token: string, type: keyof JwtType) {
     res.cookie(
       this.authConfig.jwt[type].cookieName,
       token,
@@ -155,7 +156,7 @@ export class AuthService {
     };
   }
 
-  private generateToken(payload: JwtPayload, type: keyof JwtConfig) {
+  private generateToken(payload: JwtPayload, type: keyof JwtType) {
     return this.jwtService.sign(payload, {
       secret: this.authConfig.jwt[type].secret,
       expiresIn: this.authConfig.jwt[type].expiresIn,

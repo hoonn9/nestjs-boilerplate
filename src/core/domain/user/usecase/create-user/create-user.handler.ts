@@ -28,7 +28,7 @@ export class CreateUserHandler implements CreateUserUseCase {
     let password: string | null = null;
 
     if (port.password) {
-      password = await this.cryptoService.hash(port.password, 10);
+      password = await this.cryptoService.hashByBcrypt(port.password, 10);
     }
 
     const userModel = new User({

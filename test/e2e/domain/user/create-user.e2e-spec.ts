@@ -32,8 +32,12 @@ describe('CreateUser E2E', () => {
         });
 
       expect(loginUserRes.status).toBe(HttpStatus.CREATED);
+      expect(loginUserRes.body.statusCode).toBe(HttpStatus.CREATED);
 
-      const loginUserDto = plainToInstance(UserModelDto, loginUserRes.body);
+      const loginUserDto = plainToInstance(
+        UserModelDto,
+        loginUserRes.body.data,
+      );
       expect(validate(loginUserDto)).resolves.toHaveLength(0);
     });
   });
